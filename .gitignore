@@ -1,5 +1,5 @@
 /server/target/
-/server/.idea/
+/.idea/
 /server/*.iml
 /server/*.log
 /server/*.class
