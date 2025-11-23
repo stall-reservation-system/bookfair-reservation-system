@@ -1,5 +1,5 @@
 package com.bookfair.user.controller;
-
+import org.springframework.transaction.annotation.Transactional;
 import com.bookfair.user.model.Reservation;
 import com.bookfair.user.model.Stall;
 import com.bookfair.user.model.User;
@@ -68,17 +68,18 @@ public class ReservationController {
         ));
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/{userId}")
     public ResponseEntity<?> getReservationsByUser(@PathVariable Integer userId) {
         Optional<User> userOpt = userRepository.findById(userId);
 
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found"));
-        }
+         if (userOpt.isEmpty()) {
+             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found"));
+         }
 
-        List<Reservation> reservations = reservationRepository.findByUser(userOpt.get());
-        return ResponseEntity.ok(reservations);
-    }
+    List<Reservation> reservations = reservationRepository.findByUser(userOpt.get());
+    return ResponseEntity.ok(reservations);
+}
 
     @GetMapping("/cancel/{reservationId}")
     public ResponseEntity<?> cancelReservation(@PathVariable Integer reservationId) {

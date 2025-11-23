@@ -27,23 +27,18 @@ public class AuthService {
             Integer businessId,
             String inviteCode,
             String contactNumber,
-            String role) {
+            String role
+    ) {
         if (userRepository.existsByEmail(email)) {
             throw new RuntimeException("Email already registered");
         }
 
-        Business business = null;
-        if (!"admin".equals(role)) {
-            if (businessId == null) {
-                throw new RuntimeException("Business ID is required for non-admin users.");
-            }
-            business = businessRepository.findById(businessId)
-                    .orElseThrow(() -> new RuntimeException("Business not found."));
+        Business business = businessRepository.findById(businessId)
+                .orElseThrow(() -> new RuntimeException("Business not found."));
 
-            if (!passwordEncoder.matches(inviteCode, business.getInviteCodeHash())) {
-                throw new RuntimeException("Invalid invite code for selected business.");
-            }
-        }
+        // if (!passwordEncoder.matches(inviteCode, business.getInviteCodeHash())) {
+        //     throw new RuntimeException("Invalid invite code for selected business.");
+        // }
 
         User user = new User();
         user.setName(name);
@@ -59,6 +54,7 @@ public class AuthService {
     public User login(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid email or password."));
+     
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new RuntimeException("Invalid email or password.");

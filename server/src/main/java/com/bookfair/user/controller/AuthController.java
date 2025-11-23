@@ -29,37 +29,62 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
 
+    // ================= Register Endpoint =================
     @PostMapping("/register")
-    public User register(@RequestBody RegisterRequest request) {
-        return authService.register(
-                request.getName(),
-                request.getEmail(),
-                request.getPassword(),
-                request.getBusinessId(),
-                request.getInviteCode(),
-                request.getContactNumber(),
-                request.getRole()
-        );
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+            User user = authService.register(
+                    request.getName(),
+                    request.getEmail(),
+                    request.getPassword(),
+                    request.getBusinessId(),
+                    request.getInviteCode(),
+                    request.getContactNumber(),
+                    request.getRole()
+            );
+
+            // Return user and success message
+            return ResponseEntity.ok(Map.of(
+                    "message", "Registration successful!",
+                    "user", user
+            ));
+
+        } catch (RuntimeException e) {
+            // Return 400 with backend error message
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
 
+    // ================= Login Endpoint =================
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-
         Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
 
         if (userOpt.isEmpty() || !passwordEncoder.matches(request.getPassword(), userOpt.get().getPasswordHash())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid credentials"));
         }
 
         User user = userOpt.get();
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
         return ResponseEntity.ok(Map.of(
+                "message", "Login successful",
                 "token", token,
                 "user", user
         ));
     }
 
+    // ================= Exception Handling =================
+    // Optional: global fallback for unhandled runtime exceptions
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", e.getMessage()));
+    }
+
+    // ================= Request DTOs =================
     public static class RegisterRequest {
         private String name;
         private String email;
@@ -85,21 +110,11 @@ public class AuthController {
         public String getInviteCode() { return inviteCode; }
         public void setInviteCode(String inviteCode) { this.inviteCode = inviteCode; }
 
-        public String getContactNumber() {
-            return contactNumber;
-        }
+        public String getContactNumber() { return contactNumber; }
+        public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
 
-        public void setContactNumber(String contactNumber) {
-            this.contactNumber = contactNumber;
-        }
-
-        public String getRole() {
-            return role;
-        }
-
-        public void setRole(String role) {
-            this.role = role;
-        }
+        public String getRole() { return role; }
+        public void setRole(String role) { this.role = role; }
     }
 
     public static class LoginRequest {

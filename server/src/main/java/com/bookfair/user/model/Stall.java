@@ -36,8 +36,23 @@ public class Stall {
     private StallTypes size;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private StallStatuses status;
+
+    @Column(nullable = true)
+    private String height;
+
+    @Column(nullable = true)
+    private String width;
+
+    @Column(nullable = true)
+    private String section;
+
+    @Column(nullable = true)
+    private Integer x;  // X-coordinate
+
+    @Column(nullable = true)
+    private Integer y;  // Y-coordinate
 
     @PrePersist
     public void prePersist() {
@@ -45,12 +60,11 @@ public class Stall {
             stallCode = "ST-" + System.currentTimeMillis();
         }
         if (status == null) {
-            status = StallStatuses.AVAILABLE; 
+            status = StallStatuses.AVAILABLE;
         }
     }
 
     // Getters and Setters
-
     public Integer getStallId() {
         return stallId;
     }
@@ -121,5 +135,45 @@ public class Stall {
 
     public void setStatus(StallStatuses status) {
         this.status = status;
+    }
+
+    public String getHeight() {
+        return height;
+    }
+
+    public void setHeight(String height) {
+        this.height = height;
+    }
+
+    public String getWidth() {
+        return width;
+    }
+
+    public void setWidth(String width) {
+        this.width = width;
+    }
+
+    public String getSection() {
+        return section;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
+    }
+
+    public Integer getX() {
+        return x;
+    }
+
+    public void setX(Integer x) {
+        this.x = x;
+    }
+
+    public Integer getY() {
+        return y;
+    }
+
+    public void setY(Integer y) {
+        this.y = y;
     }
 }
