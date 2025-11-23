@@ -1,6 +1,7 @@
 package com.bookfair.user.controller;
 
 import com.bookfair.user.model.Business;
+import com.bookfair.user.model.Stall;
 import com.bookfair.user.repository.BusinessRepository;
 import com.bookfair.user.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -76,4 +77,37 @@ public class BusinessController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "Business not found")));
     }
+
+    @PostMapping
+    public ResponseEntity<Business> createBusiness(@RequestBody createBusinessDTO business) {       
+        Business newBusiness = new Business();
+        newBusiness.setName(business.getName());    
+        newBusiness.setRegistrationNumber(business.getRegistrationNumber());
+        newBusiness.setContactNumber(business.getContactNumber());
+        newBusiness.setAddress(business.getAddress());
+        Business createdBusiness = businessRepository.save(newBusiness);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBusiness);
+    }
+
+
+    //DTOs
+    public static class createBusinessDTO {
+         
+            private String name;
+            private String registrationNumber;
+            private String contactNumber;
+            private String address;
+         
+           public String getName() { return name; }
+           public void setName(String name) { this.name = name; }
+
+           public String getRegistrationNumber() { return registrationNumber; }
+           public void setRegistrationNumber(String registrationNumber) { this.registrationNumber = registrationNumber; }
+
+           public String getContactNumber() { return contactNumber; }
+           public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
+
+           public String getAddress() { return address; }
+           public void setAddress(String address) { this.address = address; }
+       }
 }
